@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Главная страница</title>
+</head>
+<body>
+<h1>Добро пожаловать!</h1>
+<div th:if="${#authorization.expression('isAuthenticated()')}">
+    <p>Вы вошли как: <span th:text="${#authentication.principal.username}"></span></p>
+    <p>Email: <span th:text="${#authentication.principal.email}"></span></p>
+    <form th:action="@{/logout}" method="post">
+        <input type="submit" value="Выйти"/>
+    </form>
+</div>
+<div th:unless="${#authorization.expression('isAuthenticated()')}">
+    <a href="/login">Вход</a> | <a href="/registration">Регистрация</a>
+</div>
+</body>
+</html>
