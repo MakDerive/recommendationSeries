@@ -1,19 +1,186 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>Главная страница</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<h1>Добро пожаловать!</h1>
-<div th:if="${#authorization.expression('isAuthenticated()')}">
-    <p>Вы вошли как: <span th:text="${#authentication.principal.username}"></span></p>
-    <p>Email: <span th:text="${#authentication.principal.email}"></span></p>
-    <form th:action="@{/logout}" method="post">
-        <input type="submit" value="Выйти"/>
-    </form>
-</div>
-<div th:unless="${#authorization.expression('isAuthenticated()')}">
-    <a href="/login">Вход</a> | <a href="/registration">Регистрация</a>
-</div>
+<header>
+    <div class="header-content">
+        <h1>FindYourSeries</h1>
+        <nav class="main-nav">
+            <a th:href="@{/}" class="nav-link">Главная</a>
+            <a th:href="@{/search}" class="nav-link">Поиск</a>
+        </nav>
+        <div class="auth-section">
+            <div th:if="${username}" class="user-info">
+                <span th:text="${username}" class="username"></span>
+                <form th:action="@{/logout}" method="post" class="logout-form">
+                    <button type="submit" class="btn logout-btn">Выйти</button>
+                </form>
+            </div>
+            <div th:unless="${username}" class="auth-buttons">
+                <a th:href="@{/login}" class="btn">Войти</a>
+                <a th:href="@{/registration}" class="btn">Зарегистрироваться</a>
+            </div>
+        </div>
+
+    </div>
+</header>
+<main>
+
+    <h2>Последние релизы</h2>
+    <section class="series-carousel">
+        <button class="carousel-button prev" onclick="moveCarousel(-1)">❮</button>
+        <div class="carousel-container">
+            <div class="carousel-track" id="carouselTrack">
+                <div class="carousel-slide" th:each="series : ${allSeries}">
+                    <div class="image-container">
+                        <img th:src="${series.seriesImgUrl}" alt="Series poster">
+<!--                        <div th:if="${#authentication.principal != 'anonymousUser'}"  class="like-dislike-buttons">-->
+<!--                            <button class="like-btn"-->
+<!--                                    th:onclick="'likeSeries(' + ${series.id} + ')'"></button>-->
+<!--                            <button class="dislike-btn"-->
+<!--                                    th:onclick="'dislikeSeries(' + ${series.id} + ')'"></button>-->
+<!--                        </div>-->
+                        <div class="series-info">
+                            <span class="series-rating" th:text="${series.rating}"></span>
+                            <span class="series-seasons-count"
+                                  th:text="${series.seasonsCount} + ' сезон'"></span>
+                        </div>
+                    </div>
+                    <span class="series-name" th:text="${series.name}"></span>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-button next" onclick="moveCarousel(1)">❯</button>
+    </section>
+
+</main>
+
+<script>
+    const track = document.getElementById('carouselTrack');
+    const slides = document.querySelectorAll('.carousel-slide');
+    const slideCount = slides.length;
+    let currentIndex = 0;
+    let isAnimating = false;
+
+    // Клонируем первые 3 слайда и добавляем их в конец для бесконечного эффекта
+    function cloneSlides() {
+        const firstSlides = Array.from(slides).slice(0, 3);
+        firstSlides.forEach(slide => {
+            const clone = slide.cloneNode(true);
+            track.appendChild(clone);
+        });
+    }
+
+    // Инициализация карусели
+    function initCarousel() {
+        cloneSlides();
+        const slideWidth = slides[0].offsetWidth + 20;
+        track.style.width = `${slideWidth * (slideCount + 3)}px`;
+    }
+
+    // Плавное перемещение карусели
+    function moveCarousel(direction) {
+        if (isAnimating) return;
+        isAnimating = true;
+
+        const allSlides = document.querySelectorAll('.carousel-slide');
+        const totalSlides = allSlides.length;
+        const slideWidth = allSlides[0].offsetWidth + 20;
+
+        currentIndex += direction;
+
+        // Если достигли конца (последний оригинальный слайд)
+        if (currentIndex >= slideCount) {
+            currentIndex = 0;
+            // Плавный переход к началу
+            track.style.transition = 'transform 0.5s ease';
+            track.style.transform = `translateX(-${slideCount * slideWidth}px)`;
+
+            // После анимации мгновенно возвращаемся к началу без анимации
+            setTimeout(() => {
+                track.style.transition = 'none';
+                track.style.transform = `translateX(0)`;
+                isAnimating = false;
+            }, 500);
+        }
+        // Если нажали "назад" в начале
+        else if (currentIndex < 0) {
+            currentIndex = slideCount - 1;
+            // Плавный переход к концу
+            track.style.transition = 'transform 0.5s ease';
+            track.style.transform = `translateX(0)`;
+
+            // После анимации мгновенно переходим к концу
+            setTimeout(() => {
+                track.style.transition = 'none';
+                track.style.transform = `translateX(-${(slideCount - 1) * slideWidth}px)`;
+                isAnimating = false;
+            }, 500);
+        }
+        // Обычное перемещение
+        else {
+            track.style.transition = 'transform 0.5s ease';
+            track.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
+            setTimeout(() => {
+                isAnimating = false;
+            }, 500);
+        }
+    }
+    // function likeSeries(seriesId) {
+    //     const btn = event.target;
+    //     btn.classList.add('clicked');
+    //     setTimeout(() => btn.classList.remove('clicked'), 300);
+    //
+    //     // Удаляем активный класс с противоположной кнопки
+    //     const dislikeBtn = btn.parentElement.querySelector('.dislike-btn');
+    //     dislikeBtn.classList.remove('active');
+    //
+    //     // Добавляем/удаляем активный класс
+    //     btn.classList.toggle('active');
+    //
+    //     // Отправка данных на сервер
+    //     fetch(`/api/series/${seriesId}/like`, {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         }
+    //     }).then(response => {
+    //         if (!response.ok) {
+    //             btn.classList.toggle('active');
+    //         }
+    //     });
+    // }
+
+    // function dislikeSeries(seriesId) {
+    //     const btn = event.target;
+    //     btn.classList.add('clicked');
+    //     setTimeout(() => btn.classList.remove('clicked'), 300);
+    //
+    //     // Удаляем активный класс с противоположной кнопки
+    //     const likeBtn = btn.parentElement.querySelector('.like-btn');
+    //     likeBtn.classList.remove('active');
+    //
+    //     // Добавляем/удаляем активный класс
+    //     btn.classList.toggle('active');
+    //
+    //     // Отправка данных на сервер
+    //     fetch(`/api/series/${seriesId}/dislike`, {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         }
+    //     }).then(response => {
+    //         if (!response.ok) {
+    //             btn.classList.toggle('active');
+    //         }
+    //     });
+    // }
+
+    // Инициализация при загрузке
+    window.addEventListener('load', initCarousel);
+</script>
 </body>
-</html>
