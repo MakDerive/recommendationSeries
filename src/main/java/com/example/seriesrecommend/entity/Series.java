@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "series")
@@ -23,13 +24,13 @@ public class Series {
     private String seriesImgUrl;
 
 
-//    @ManyToMany
-//    @JoinTable(
-//            name = "series_genres",
-//            joinColumns = @JoinColumn(name = "series_id"),
-//            inverseJoinColumns = @JoinColumn(name = "genre_id")
-//    )
-    //private List<Genre> genres;
+    @ManyToMany
+    @JoinTable(
+            name = "series_genres",
+            joinColumns = @JoinColumn(name = "series_id"),
+            inverseJoinColumns = @JoinColumn(name = "genre_id")
+    )
+    private List<Genre> genres;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;

@@ -1,14 +1,24 @@
 package com.example.seriesrecommend.controller;
 
+import com.example.seriesrecommend.entity.Series;
 import com.example.seriesrecommend.entity.UserEntity;
+import com.example.seriesrecommend.service.SeriesService;
+import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.util.List;
+
 @Controller
+@AllArgsConstructor
 public class ContentController {
+
+    SeriesService seriesService;
+
+
     @GetMapping("/")
     public String index(
             Model model
@@ -19,6 +29,8 @@ public class ContentController {
             model.addAttribute("username", userDetails.getUsername());
             model.addAttribute("email", userDetails.getEmail());
         }
+        List<Series> allSeries = seriesService.getSeries();
+        model.addAttribute("allSeries",allSeries);
         return "index";
     }
 
