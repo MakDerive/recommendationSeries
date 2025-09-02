@@ -38,12 +38,12 @@
                 <div class="carousel-slide" th:each="series : ${allSeries}">
                     <div class="image-container">
                         <img th:src="${series.seriesImgUrl}" alt="Series poster">
-<!--                        <div th:if="${#authentication.principal != 'anonymousUser'}"  class="like-dislike-buttons">-->
-<!--                            <button class="like-btn"-->
-<!--                                    th:onclick="'likeSeries(' + ${series.id} + ')'"></button>-->
-<!--                            <button class="dislike-btn"-->
-<!--                                    th:onclick="'dislikeSeries(' + ${series.id} + ')'"></button>-->
-<!--                        </div>-->
+                        <div th:if="${#authentication.principal != 'anonymousUser'}"  class="like-dislike-buttons">
+                            <button class="like-btn"
+                                    th:onclick="'likeSeries(' + ${series.id} + ')'"></button>
+                            <button class="dislike-btn"
+                                    th:onclick="'dislikeSeries(' + ${series.id} + ')'"></button>
+                        </div>
                         <div class="series-info">
                             <span class="series-rating" th:text="${series.rating}"></span>
                             <span class="series-seasons-count"
