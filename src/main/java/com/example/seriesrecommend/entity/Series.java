@@ -32,6 +32,7 @@ public class Series {
     )
     private List<Genre> genres;
 
+
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 

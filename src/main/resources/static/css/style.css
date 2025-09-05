@@ -10,6 +10,10 @@
     --text-light: #ffffff;
 }
 
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 img {
     max-width: 100%;
     max-height: 300px;
@@ -25,7 +29,6 @@ header {
     background-color: white;
     box-shadow: none;
     border-bottom: 1px solid #efefef;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* Контейнер внутри header */
@@ -520,10 +523,6 @@ main {
     gap: 1rem;
 }
 
-.username {
-    font-weight: bold;
-    color: var(--text-light);
-}
 
 .btn {
     display: inline-block;
@@ -725,3 +724,4 @@ main {
 .nav-link:hover {
     background-color: rgba(255,255,255,0.1);
 }
+

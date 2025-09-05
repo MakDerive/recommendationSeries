@@ -15,9 +15,10 @@ public class SeriesService {
     SeriesRepository seriesRepository;
 
     public List<Series> getSeries() {
-        List<Series> series = seriesRepository.findAll();
-        return series;
+        return seriesRepository.findAll();
     }
+
+
 
     public List<Series> searchSeries(String query) {
         return seriesRepository.findByNameContainingIgnoreCase(query);

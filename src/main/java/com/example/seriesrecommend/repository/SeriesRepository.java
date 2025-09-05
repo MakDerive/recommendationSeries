@@ -10,6 +10,7 @@ import java.util.Optional;
 @Repository
 public interface SeriesRepository extends JpaRepository<Series,Long> {
     Optional<Series> findByName(String name);
+    Optional<Series> findById(Long id);
     List<Series> findAll();
     List<Series> findByNameContainingIgnoreCase(String name);
 }
