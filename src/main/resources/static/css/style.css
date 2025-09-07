@@ -524,6 +524,24 @@ main {
 }
 
 
+.error-message {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    padding: 0.25rem;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+}
+
+
 .btn {
     display: inline-block;
     padding: 0.5rem 1rem;
@@ -724,4 +742,58 @@ main {
 .nav-link:hover {
     background-color: rgba(255,255,255,0.1);
 }
+
+.series-list {
+    margin: 2rem 0;
+    padding: 1rem 0;
+}
+
+.list-container {
+    width: 100%;
+}
+
+.list-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 20px;
+    justify-content: center;
+}
+
+.list-item {
+    position: relative;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.list-item:hover {
+    transform: translateY(-5px);
+}
+
+/* Адаптивность для списка */
+@media (max-width: 768px) {
+    .list-items {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 15px;
+    }
+
+    .image-container {
+        width: 160px;
+        height: 240px;
+    }
+}
+
+@media (max-width: 480px) {
+    .list-items {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 10px;
+    }
+
+    .image-container {
+        width: 140px;
+        height: 210px;
+    }
+}
+
+
+
 

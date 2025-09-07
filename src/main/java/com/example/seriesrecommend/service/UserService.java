@@ -1,5 +1,6 @@
 package com.example.seriesrecommend.service;
 
+import com.example.seriesrecommend.dto.RegistrationRequest;
 import com.example.seriesrecommend.entity.Token;
 import com.example.seriesrecommend.entity.UserEntity;
 import com.example.seriesrecommend.repository.UserRepository;
@@ -29,18 +30,18 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
     }
 
-    public void registerUser(String username, String email, String password) {
-        if (userRepository.existsByUsername(username)) {
+    public void registerUser(RegistrationRequest registrationRequest) {
+        if (userRepository.existsByUsername(registrationRequest.getUsername())) {
             throw new RuntimeException("Username already exists");
         }
-        if (userRepository.existsByEmail(email)) {
+        if (userRepository.existsByEmail(registrationRequest.getEmail())) {
             throw new RuntimeException("Email already exists");
         }
 
         UserEntity user = new UserEntity();
-        user.setUsername(username);
-        user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(password));
+        user.setUsername(registrationRequest.getUsername());
+        user.setEmail(registrationRequest.getEmail());
+        user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
         user.setEnabled(false);
         userRepository.save(user);
 

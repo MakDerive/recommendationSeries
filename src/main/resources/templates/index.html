@@ -30,7 +30,7 @@
 </header>
 <main>
 
-    <h2>Последние релизы</h2>
+    <h2>Популярные сериалы</h2>
     <section class="series-carousel">
         <button class="carousel-button prev" onclick="moveCarousel(-5)">❮</button>
         <div class="carousel-container">
@@ -57,6 +57,47 @@
         <button class="carousel-button next" onclick="moveCarousel(5)">❯</button>
     </section>
 
+    <div th:if="${#authentication.principal != 'anonymousUser'}">
+        <h2>Рекомендация для вас</h2>
+        <section th:if="${#lists.size(allSeries) >= 10}" class="series-list">
+            <div class="list-container">
+                <div class="list-items">
+                    <div class="list-item" th:each="series : ${allSeries}">
+                        <div class="image-container">
+                            <img th:src="${series.seriesImgUrl}" alt="Series poster">
+                            <div th:if="${#authentication.principal != 'anonymousUser'}"
+                                 class="like-dislike-buttons">
+                                <button class="like-btn"
+                                        th:onclick="'likeSeries(' + ${series.id} + ')'"></button>
+                                <button class="dislike-btn"
+                                        th:onclick="'dislikeSeries(' + ${series.id} + ')'"></button>
+                            </div>
+                            <div class="series-info">
+                                <span class="series-rating" th:text="${series.rating}"></span>
+                                <span class="series-seasons-count"
+                                      th:text="${series.seasonsCount} + ' сезон'"></span>
+                            </div>
+                        </div>
+                        <span class="series-name" th:text="${series.name}"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div th:unless="${#lists.size(allSeries) >= 10}" class="auth-promo-content">
+            <h3>Персонализированные рекомендации</h3>
+            <p>Выберите 10 сериалов, которые вам понравились (нажав лайк сериалу), чтобы мы смогли подобрать вам рекомендации,
+                также выберете сериалы которые не понравились</p>
+        </div>
+    </div>
+    <div th:unless="${#authentication.principal != 'anonymousUser'}"
+         class="auth-promo">
+        <div class="auth-promo-content">
+            <h3>Персонализированные рекомендации</h3>
+            <p>Зарегистрируйтесь, чтобы получать подборки сериалов
+                специально для вас!</p>
+        </div>
+    </div>
+
 </main>
 
 <script>
@@ -66,7 +107,6 @@
     let currentIndex = 0;
     let isAnimating = false;
 
-    // Клонируем первые 3 слайда и добавляем их в конец для бесконечного эффекта
     function cloneSlides() {
         const firstSlides = Array.from(slides).slice(0, 5);
         firstSlides.forEach(slide => {
@@ -75,14 +115,12 @@
         });
     }
 
-    // Инициализация карусели
     function initCarousel() {
         cloneSlides();
         const slideWidth = slides[0].offsetWidth + 20;
         track.style.width = `${slideWidth * (slideCount + 3)}px`;
     }
 
-    // Плавное перемещение карусели
     function moveCarousel(direction) {
         if (isAnimating) return;
         isAnimating = true;
@@ -93,35 +131,28 @@
 
         currentIndex += direction;
 
-        // Если достигли конца (последний оригинальный слайд)
         if (currentIndex >= slideCount) {
             currentIndex = 0;
-            // Плавный переход к началу
             track.style.transition = 'transform 0.5s ease';
             track.style.transform = `translateX(-${slideCount * slideWidth}px)`;
 
-            // После анимации мгновенно возвращаемся к началу без анимации
             setTimeout(() => {
                 track.style.transition = 'none';
                 track.style.transform = `translateX(0)`;
                 isAnimating = false;
             }, 500);
         }
-        // Если нажали "назад" в начале
         else if (currentIndex < 0) {
             currentIndex = slideCount - 1;
-            // Плавный переход к концу
             track.style.transition = 'transform 0.5s ease';
             track.style.transform = `translateX(0)`;
 
-            // После анимации мгновенно переходим к концу
             setTimeout(() => {
                 track.style.transition = 'none';
                 track.style.transform = `translateX(-${(slideCount - 1) * slideWidth}px)`;
                 isAnimating = false;
             }, 500);
         }
-        // Обычное перемещение
         else {
             track.style.transition = 'transform 0.5s ease';
             track.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
@@ -135,14 +166,11 @@
         btn.classList.add('clicked');
         setTimeout(() => btn.classList.remove('clicked'), 300);
 
-        // Удаляем активный класс с противоположной кнопки
         const dislikeBtn = btn.parentElement.querySelector('.dislike-btn');
         dislikeBtn.classList.remove('active');
 
-        // Добавляем/удаляем активный класс
         btn.classList.toggle('active');
 
-        // Отправка данных на сервер
         fetch(`/api/series/${seriesId}/like`, {
             method: 'POST',
             headers: {
@@ -160,14 +188,11 @@
         btn.classList.add('clicked');
         setTimeout(() => btn.classList.remove('clicked'), 300);
 
-        // Удаляем активный класс с противоположной кнопки
         const likeBtn = btn.parentElement.querySelector('.like-btn');
         likeBtn.classList.remove('active');
 
-        // Добавляем/удаляем активный класс
         btn.classList.toggle('active');
 
-        // Отправка данных на сервер
         fetch(`/api/series/${seriesId}/dislike`, {
             method: 'POST',
             headers: {
@@ -180,7 +205,6 @@
         });
     }
 
-    // Инициализация при загрузке
     window.addEventListener('load', initCarousel);
 </script>
 </body>

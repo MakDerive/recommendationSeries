@@ -1,18 +1,20 @@
 package com.example.seriesrecommend.controller;
 
+import com.example.seriesrecommend.dto.RegistrationRequest;
 import com.example.seriesrecommend.entity.Token;
 import com.example.seriesrecommend.entity.UserEntity;
+import com.example.seriesrecommend.repository.TokenRepository;
 import com.example.seriesrecommend.repository.UserRepository;
 import com.example.seriesrecommend.service.TokenService;
 import com.example.seriesrecommend.service.UserService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
@@ -25,22 +27,27 @@ public class AuthController {
     private final UserRepository userRepository;
     private final TokenService tokenService;
     private  UserService userService;
-    private final Logger logger = Logger.getLogger(AuthController.class.getName());
+    private TokenRepository tokenRepository;
 
 
     @GetMapping("registration")
-    public String registration() {
+    public String registration(Model model) {
+        model.addAttribute("registrationRequest",new RegistrationRequest());
         return "registration";
     }
 
     @PostMapping("registration")
-    public String registerUser(@RequestParam String username,
-                               @RequestParam String email,
-                               @RequestParam String password,
+    public String registerUser(@Valid @ModelAttribute("registrationRequest") RegistrationRequest registrationRequest,
+                               BindingResult bindingResult,
                                Model model,
                                RedirectAttributes redirectAttributes) {
+
+        if (bindingResult.hasErrors()) {
+            return "registration";
+        }
+
         try {
-            userService.registerUser(username, email, password);
+            userService.registerUser(registrationRequest);
             redirectAttributes.addFlashAttribute(
                     "message",
                     "Please confirm your email address");
@@ -63,7 +70,8 @@ public class AuthController {
     }
 
     @PostMapping("/reset_password")
-    public String resetPassword(@RequestParam String email,Model model) {
+    public String resetPassword(@RequestParam String email,
+                                Model model) {
         try {
             userRepository.findByEmail(email).orElseThrow(
                     () -> new RuntimeException("Email not found")
@@ -82,7 +90,6 @@ public class AuthController {
         UserEntity user = tokenService.findByToken(token).orElseThrow(
                 () -> new RuntimeException("Token not found")
         ).getUser();
-        logger.info(user.getEmail());
         return "new_password";
     }
 
@@ -94,22 +101,27 @@ public class AuthController {
                               RedirectAttributes redirectAttributes) {
         try {
             if (!password.equals(confirmPassword)) {
-                throw new RuntimeException("Passwords do not match");
+                model.addAttribute("error", "Пароли должны совпадать");
+                model.addAttribute("token", token);
+                return "new_password";
+            }
+            if (password.length() < 6) {
+                model.addAttribute("error", "Пароль должен содержать минимум 6 символов");
+                model.addAttribute("token", token);
+                return "new_password";
             }
 
-            // Проверяем валидность токена
             Token resetToken = tokenService.findByToken(token).orElseThrow(
                     () -> new RuntimeException("Token not found")
             );
 
-            // Проверяем не истек ли токен
             if (resetToken.getExpiresAt().isBefore(LocalDateTime.now())) {
                 throw new RuntimeException("Token expired");
             }
 
             UserEntity user = resetToken.getUser();
             userService.newPassword(user, password);
-            userRepository.save(user); // Не забудьте сохранить пользователя!
+            userRepository.save(user);
 
             redirectAttributes.addFlashAttribute(
                     "message",
@@ -117,7 +129,7 @@ public class AuthController {
             return "redirect:/login";
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
-            model.addAttribute("token", token); // Возвращаем токен для повторной попытки
+            model.addAttribute("token", token);
             return "new_password";
         }
     }

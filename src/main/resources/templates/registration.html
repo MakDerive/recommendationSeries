@@ -12,20 +12,29 @@
         <p th:text="${error}"></p>
     </div>
 
-    <form th:action="@{/registration}" method="post" class="auth-form">
+    <form th:action="@{/registration}" method="post" class="auth-form" th:object="${registrationRequest}">
         <div class="form-group">
             <label>Имя пользователя</label>
             <input type="text" name="username" class="form-input" required placeholder="Придумайте имя пользователя">
+            <div th:if="${#fields.hasErrors('username')}" class="error-message">
+                <p th:each="error : ${#fields.errors('username')}" th:text="${error}"></p>
+            </div>
         </div>
 
         <div class="form-group">
             <label>Email</label>
             <input type="email" name="email" class="form-input" required placeholder="Введите ваш email">
+            <div th:if="${#fields.hasErrors('email')}" class="error-message">
+                <p th:each="error : ${#fields.errors('email')}" th:text="${error}"></p>
+            </div>
         </div>
 
         <div class="form-group">
             <label>Пароль</label>
             <input type="password" name="password" class="form-input" required placeholder="Придумайте пароль">
+            <div th:if="${#fields.hasErrors('password')}" class="error-message">
+                <p th:each="error : ${#fields.errors('password')}" th:text="${error}"></p>
+            </div>
         </div>
 
         <button type="submit" class="btn-secondary">Зарегистрироваться</button>

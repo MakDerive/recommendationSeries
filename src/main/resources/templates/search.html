@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Поиск сериалов</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header>
+    <div class="header-content">
+        <h1>FindYourSeries</h1>
+        <nav class="main-nav">
+            <a th:href="@{/}" class="nav-link">Главная</a>
+            <a th:href="@{/search}" class="nav-link">Поиск</a>
+        </nav>
+        <div class="auth-section">
+            <div th:if="${username}" class="user-info">
+                <span th:text="${username}" class="username"></span>
+                <form th:action="@{/logout}" method="post" class="logout-form">
+                    <button type="submit" class="btn logout-btn">Выйти</button>
+                </form>
+            </div>
+            <div th:unless="${username}" class="auth-buttons">
+                <a th:href="@{/login}" class="btn">Войти</a>
+                <a th:href="@{/registration}" class="btn">Зарегистрироваться</a>
+            </div>
+        </div>
+    </div>
+</header>
+<main>
+    <div class="content">
+        <h2>Поиск сериалов</h2>
+
+        <form th:action="@{/search}" method="get" class="search-form">
+            <input type="text" name="query" th:value="${query}" placeholder="Введите название сериала">
+            <button type="submit" class="btn">Найти</button>
+        </form>
+
+        <div th:if="${query != null}">
+            <h3 th:if="${query != ''}">Результаты поиска для "<span th:text="${query}"></span>"</h3>
+            <h3 th:if="${query == ''}">Все сериалы</h3>
+
+            <div th:if="${#lists.isEmpty(searchResults)}" class="no-results">
+                <p>Ничего не найдено</p>
+            </div>
+
+            <div th:unless="${#lists.isEmpty(searchResults)}" class="search-results">
+                <div class="list-container">
+                    <div class="list-items">
+                        <div class="list-item" th:each="series : ${searchResults}">
+                            <div class="image-container">
+                                <img th:src="${series.seriesImgUrl}" alt="Series poster">
+                                <div th:if="${#authentication.principal != 'anonymousUser'}"
+                                     class="like-dislike-buttons">
+                                    <button class="like-btn"
+                                            th:onclick="'likeSeries(' + ${series.id} + ')'"></button>
+                                    <button class="dislike-btn"
+                                            th:onclick="'dislikeSeries(' + ${series.id} + ')'"></button>
+                                </div>
+                                <div class="series-info">
+                                    <span class="series-rating" th:text="${series.rating}"></span>
+                                    <span class="series-seasons-count"
+                                          th:text="${series.seasonsCount} + ' сезон'"></span>
+                                </div>
+                            </div>
+                            <span class="series-name" th:text="${series.name}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    function likeSeries(seriesId) {
+        const btn = event.target;
+        btn.classList.add('clicked');
+        setTimeout(() => btn.classList.remove('clicked'), 300);
+
+        const dislikeBtn = btn.parentElement.querySelector('.dislike-btn');
+        dislikeBtn.classList.remove('active');
+
+        btn.classList.toggle('active');
+
+        fetch(`/api/series/${seriesId}/like`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (!response.ok) {
+                btn.classList.toggle('active');
+            }
+        });
+    }
+
+    function dislikeSeries(seriesId) {
+        const btn = event.target;
+        btn.classList.add('clicked');
+        setTimeout(() => btn.classList.remove('clicked'), 300);
+
+        const likeBtn = btn.parentElement.querySelector('.like-btn');
+        likeBtn.classList.remove('active');
+
+        btn.classList.toggle('active');
+
+        fetch(`/api/series/${seriesId}/dislike`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (!response.ok) {
+                btn.classList.toggle('active');
+            }
+        });
+    }
+</script>
+</body>
+</html>

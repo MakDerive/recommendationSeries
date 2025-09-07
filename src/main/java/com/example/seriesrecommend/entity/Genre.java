@@ -1,26 +1,28 @@
 package com.example.seriesrecommend.entity;
 
-
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.util.List;
-
-@Entity
-@Table(name="genre")
-@Setter
-@Getter
-public class Genre {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "name",  unique = true, nullable = false)
-    private String name;
-
-    @ManyToMany(mappedBy = "genres")
-    private List<Series> series;
-
+public enum Genre {
+    DRAMA,               // Драма
+    MELODRAMA,           // Мелодрама
+    COMEDY,              // Комедия
+    THRILLER,            // Триллер
+    CRIME,               // Криминал
+    DETECTIVE,           // Детектив
+    FANTASY,             // Фэнтези
+    SCIENCE_FICTION,     // Научная фантастика
+    HORROR,              // Ужасы
+    ROMANCE,             // Романтика
+    HISTORICAL,          // Исторический
+    ADVENTURE,           // Приключения
+    ACTION,              // Боевик
+    WESTERN,             // Вестерн
+    SUPERNATURAL,        // Сверхъестественное
+    MYSTERY,             // Мистика
+    MEDICAL,             // Медицинский
+    LEGAL,               // Юридический
+    POLITICAL,           // Политический
+    SPY,                 // Шпионский
+    ANTHOLOGY,           // Антология
+    DOCUDRAMA,           // Документальная драма
+    SITCOM,              // Ситуационная комедия
+    ANIME                // АНИМЕ
 }

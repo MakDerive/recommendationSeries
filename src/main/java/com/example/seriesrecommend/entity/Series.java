@@ -6,7 +6,9 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "series")
@@ -24,26 +26,17 @@ public class Series {
     private String seriesImgUrl;
 
 
-    @ManyToMany
-    @JoinTable(
-            name = "series_genres",
-            joinColumns = @JoinColumn(name = "series_id"),
-            inverseJoinColumns = @JoinColumn(name = "genre_id")
-    )
-    private List<Genre> genres;
-
-
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String description;
+    @OneToMany(mappedBy = "series")
+    private Set<SeriesGenre> genres = new HashSet<>();
 
     @Column(nullable = false, precision = 3, scale = 1)
     private BigDecimal rating;
 
     @Column(nullable = false)
-    private LocalDate releaseDate;
+    private Integer releaseYear;
 
     @Column(nullable = false)
-    private LocalDate updateDate;
+    private Integer updateYear;
 
     @Column(nullable = false)
     private Integer seasonsCount;

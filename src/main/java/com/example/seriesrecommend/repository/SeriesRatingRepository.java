@@ -2,6 +2,8 @@ package com.example.seriesrecommend.repository;
 
 import com.example.seriesrecommend.entity.UserSeriesRating;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -10,6 +12,7 @@ import java.util.Optional;
 @Repository
 public interface SeriesRatingRepository extends JpaRepository<UserSeriesRating,Long> {
 
+
     Optional<UserSeriesRating> findByUserIdAndSeriesId(Long userId, Long seriesId);
 
     List<UserSeriesRating> findByUserId(Long userId);
@@ -17,5 +20,9 @@ public interface SeriesRatingRepository extends JpaRepository<UserSeriesRating,L
     List<UserSeriesRating> findBySeriesId(Long seriesId);
 
     boolean existsByUserIdAndSeriesId(Long userId, Long seriesId);
+
+    @Query("SELECT usr FROM UserSeriesRating usr WHERE usr.user.id = :userId AND usr.status ='LIKE'")
+    List<UserSeriesRating> findLikedSeriesByUser(@Param("userId") Long userId);
+
 
 }
