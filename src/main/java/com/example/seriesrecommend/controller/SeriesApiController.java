@@ -63,11 +63,22 @@ public class SeriesApiController {
 
         if(existingRating.isPresent()) {
             rating = existingRating.get();
-            rating.setStatus(RatingStatus.LIKE);
+            rating.setStatus(RatingStatus.DISLIKE);
         } else {
             rating = new UserSeriesRating(user,series,RatingStatus.DISLIKE);
         }
         ratingRepository.save(rating);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{seriesId}/remove-rating")
+    public ResponseEntity<Void> removeRating(@PathVariable Long seriesId,
+                                             @AuthenticationPrincipal UserEntity user) {
+        Optional<UserSeriesRating> existingRating = ratingRepository
+                .findByUserIdAndSeriesId(user.getId(), seriesId);
+        System.out.println(existingRating);
+        existingRating.ifPresent(ratingRepository::delete);
 
         return ResponseEntity.ok().build();
     }

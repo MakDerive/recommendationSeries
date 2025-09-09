@@ -1,5 +1,6 @@
 package com.example.seriesrecommend.controller;
 
+import com.example.seriesrecommend.entity.RatingStatus;
 import com.example.seriesrecommend.entity.Series;
 import com.example.seriesrecommend.entity.UserEntity;
 import com.example.seriesrecommend.entity.UserSeriesRating;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,22 +33,24 @@ public class ContentController {
     public String index(
             Model model
     ) {
+        List<Series> allSeries = seriesService.getSeries();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !auth.getName().equals("anonymousUser")) {
-            UserEntity userDetails = (UserEntity) auth.getPrincipal();
-            model.addAttribute("username", userDetails.getUsername());
-            model.addAttribute("email", userDetails.getEmail());
+            UserEntity user = (UserEntity) auth.getPrincipal();
+            model.addAttribute("username", user.getUsername());
+            model.addAttribute("email", user.getEmail());
             List<UserSeriesRating> likedRatings = seriesRatingRepository
-                    .findLikedSeriesByUser(userDetails.getId());
+                    .findLikedSeriesByUser(user.getId());
 
             List<Series> likedSeries = likedRatings.stream()
                             .map(UserSeriesRating::getSeries)
                                     .collect(Collectors.toList());
 
-
+            HashMap<Long, String> seriesStatus = seriesService.findSeriesStatus(allSeries,user);
+            model.addAttribute("seriesStatus", seriesStatus);
             model.addAttribute("likedSeries",likedSeries);
         }
-        List<Series> allSeries = seriesService.getSeries();
+
         model.addAttribute("allSeries",allSeries);
         return "index";
     }
@@ -64,6 +68,12 @@ public class ContentController {
             searchResults = seriesService.getSeries();
         } else {
             searchResults = seriesService.searchSeries(query.trim());
+        }
+
+        if (auth != null && auth.isAuthenticated() && !auth.getName().equals("anonymousUser")) {
+            UserEntity user = (UserEntity) auth.getPrincipal();
+            HashMap<Long, String> seriesStatus = seriesService.findSeriesStatus(searchResults,user);
+            model.addAttribute("seriesStatus", seriesStatus);
         }
 
         model.addAttribute("searchResults", searchResults);

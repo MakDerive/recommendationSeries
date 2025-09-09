@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Главная страница</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/style.css}">
 </head>
 <body>
 <header>
@@ -40,9 +40,13 @@
                         <img th:src="${series.seriesImgUrl}" alt="Series poster">
                         <div th:if="${#authentication.principal != 'anonymousUser'}"  class="like-dislike-buttons">
                             <button class="like-btn"
-                                    th:onclick="'likeSeries(' + ${series.id} + ')'"></button>
+                                    th:onclick="'likeSeries(' + ${series.id} + ')'"
+                                    th:classappend="${seriesStatus.get(series.id) == 'LIKE'} ? 'active' : ''">
+                            </button>
                             <button class="dislike-btn"
-                                    th:onclick="'dislikeSeries(' + ${series.id} + ')'"></button>
+                                    th:onclick="'dislikeSeries(' + ${series.id} + ')'"
+                                    th:classappend="${seriesStatus.get(series.id) == 'DISLIKE'} ? 'active' : ''">
+                            </button>
                         </div>
                         <div class="series-info">
                             <span class="series-rating" th:text="${series.rating}"></span>
@@ -68,9 +72,13 @@
                             <div th:if="${#authentication.principal != 'anonymousUser'}"
                                  class="like-dislike-buttons">
                                 <button class="like-btn"
-                                        th:onclick="'likeSeries(' + ${series.id} + ')'"></button>
+                                        th:onclick="'likeSeries(' + ${series.id} + ')'"
+                                        th:classappend="${seriesStatus.get(series.id) == 'LIKE'} ? 'active' : ''">
+                                </button>
                                 <button class="dislike-btn"
-                                        th:onclick="'dislikeSeries(' + ${series.id} + ')'"></button>
+                                        th:onclick="'dislikeSeries(' + ${series.id} + ')'"
+                                        th:classappend="${seriesStatus.get(series.id) == 'DISLIKE'} ? 'active' : ''">
+                                </button>
                             </div>
                             <div class="series-info">
                                 <span class="series-rating" th:text="${series.rating}"></span>
@@ -163,44 +171,66 @@
     }
     function likeSeries(seriesId) {
         const btn = event.target;
-        btn.classList.add('clicked');
-        setTimeout(() => btn.classList.remove('clicked'), 300);
-
         const dislikeBtn = btn.parentElement.querySelector('.dislike-btn');
+        const isCurrentlyActive = btn.classList.contains('active');
+
         dislikeBtn.classList.remove('active');
 
-        btn.classList.toggle('active');
 
-        fetch(`/api/series/${seriesId}/like`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(response => {
-            if (!response.ok) {
-                btn.classList.toggle('active');
-            }
-        });
+        if (isCurrentlyActive) {
+            btn.classList.remove('active');
+            removeRating(seriesId);
+        } else {
+            btn.classList.add('active');
+            fetch(`/api/series/${seriesId}/like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                if (!response.ok) {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        btn.classList.add('clicked');
+        setTimeout(() => btn.classList.remove('clicked'), 300);
     }
 
     function dislikeSeries(seriesId) {
         const btn = event.target;
-        btn.classList.add('clicked');
-        setTimeout(() => btn.classList.remove('clicked'), 300);
-
         const likeBtn = btn.parentElement.querySelector('.like-btn');
+        const isCurrentlyActive = btn.classList.contains('active');
+
         likeBtn.classList.remove('active');
 
-        btn.classList.toggle('active');
+        if (isCurrentlyActive) {
+            btn.classList.remove('active');
+            removeRating(seriesId);
+        } else {
+            btn.classList.add('active');
+            fetch(`/api/series/${seriesId}/dislike`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                if (!response.ok) {
+                    btn.classList.remove('active');
+                }
+            });
+        }
 
-        fetch(`/api/series/${seriesId}/dislike`, {
+        btn.classList.add('clicked');
+        setTimeout(() => btn.classList.remove('clicked'), 300);
+    }
+
+    function removeRating(seriesId) {
+        fetch(`/api/series/${seriesId}/remove-rating`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
-            }
-        }).then(response => {
-            if (!response.ok) {
-                btn.classList.toggle('active');
             }
         });
     }

@@ -24,5 +24,9 @@ public interface SeriesRatingRepository extends JpaRepository<UserSeriesRating,L
     @Query("SELECT usr FROM UserSeriesRating usr WHERE usr.user.id = :userId AND usr.status ='LIKE'")
     List<UserSeriesRating> findLikedSeriesByUser(@Param("userId") Long userId);
 
+    @Query("SELECT usr FROM UserSeriesRating usr WHERE usr.user.id = :userId AND usr.status ='DISLIKE'")
+    List<UserSeriesRating> findDislikedSeriesByUser(@Param("userId") Long userId);
+
+
 
 }
