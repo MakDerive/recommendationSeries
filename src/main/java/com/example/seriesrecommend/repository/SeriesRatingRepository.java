@@ -4,6 +4,7 @@ import com.example.seriesrecommend.entity.UserSeriesRating;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public interface SeriesRatingRepository extends JpaRepository<UserSeriesRating,L
 
     @Query("SELECT usr FROM UserSeriesRating usr WHERE usr.user.id = :userId AND usr.status ='DISLIKE'")
     List<UserSeriesRating> findDislikedSeriesByUser(@Param("userId") Long userId);
+
 
 
 

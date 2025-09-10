@@ -24,5 +24,6 @@ public enum Genre {
     ANTHOLOGY,           // Антология
     DOCUDRAMA,           // Документальная драма
     SITCOM,              // Ситуационная комедия
-    ANIME                // АНИМЕ
+    ANIME,               // АНИМЕ
+    ANIMATION            // Мультсериал
 }

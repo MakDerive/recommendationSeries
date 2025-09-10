@@ -42,4 +42,11 @@ public class SeriesService {
         return  seriesStatus;
     }
 
+    public List<Series> recommendSeries(List<Series> likedSeries, List<Series> dislikedSeries,Long userId) {
+
+        List<Series> recommendedSeries = null;
+
+        return recommendedSeries;
+
+    }
 }

@@ -63,7 +63,7 @@
 
     <div th:if="${#authentication.principal != 'anonymousUser'}">
         <h2>Рекомендация для вас</h2>
-        <section th:if="${#lists.size(allSeries) >= 10}" class="series-list">
+        <section th:if="${#lists.size(recommendSeries) >= 10}" class="series-list">
             <div class="list-container">
                 <div class="list-items">
                     <div class="list-item" th:each="series : ${allSeries}">
@@ -91,7 +91,7 @@
                 </div>
             </div>
         </section>
-        <div th:unless="${#lists.size(allSeries) >= 10}" class="auth-promo-content">
+        <div th:unless="${#lists.size(recommendSeries) >= 10}" class="auth-promo-content">
             <h3>Персонализированные рекомендации</h3>
             <p>Выберите 10 сериалов, которые вам понравились (нажав лайк сериалу), чтобы мы смогли подобрать вам рекомендации,
                 также выберете сериалы которые не понравились</p>

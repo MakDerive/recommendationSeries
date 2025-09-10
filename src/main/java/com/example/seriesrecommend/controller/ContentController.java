@@ -1,6 +1,5 @@
 package com.example.seriesrecommend.controller;
 
-import com.example.seriesrecommend.entity.RatingStatus;
 import com.example.seriesrecommend.entity.Series;
 import com.example.seriesrecommend.entity.UserEntity;
 import com.example.seriesrecommend.entity.UserSeriesRating;
@@ -15,7 +14,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,14 +39,21 @@ public class ContentController {
             model.addAttribute("email", user.getEmail());
             List<UserSeriesRating> likedRatings = seriesRatingRepository
                     .findLikedSeriesByUser(user.getId());
+            List<UserSeriesRating> dislikedRatings = seriesRatingRepository
+                    .findDislikedSeriesByUser(user.getId());
 
             List<Series> likedSeries = likedRatings.stream()
                             .map(UserSeriesRating::getSeries)
                                     .collect(Collectors.toList());
 
+            List<Series> dislikedSeries = dislikedRatings.stream()
+                    .map(UserSeriesRating::getSeries)
+                    .collect(Collectors.toList());
+
+            List<Series> recommendedSeries = seriesService.recommendSeries(likedSeries,dislikedSeries, user.getId());
             HashMap<Long, String> seriesStatus = seriesService.findSeriesStatus(allSeries,user);
             model.addAttribute("seriesStatus", seriesStatus);
-            model.addAttribute("likedSeries",likedSeries);
+            model.addAttribute("recommendSeries",recommendedSeries);
         }
 
         model.addAttribute("allSeries",allSeries);
