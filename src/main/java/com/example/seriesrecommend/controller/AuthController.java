@@ -13,12 +13,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
-import java.util.logging.Logger;
 
 @Slf4j
 @Controller
@@ -27,7 +25,6 @@ public class AuthController {
     private final UserRepository userRepository;
     private final TokenService tokenService;
     private  UserService userService;
-    private TokenRepository tokenRepository;
 
 
     @GetMapping("registration")

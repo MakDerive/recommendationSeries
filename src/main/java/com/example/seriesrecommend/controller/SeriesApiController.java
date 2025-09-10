@@ -6,7 +6,6 @@ import com.example.seriesrecommend.entity.UserEntity;
 import com.example.seriesrecommend.entity.UserSeriesRating;
 import com.example.seriesrecommend.repository.SeriesRatingRepository;
 import com.example.seriesrecommend.repository.SeriesRepository;
-import com.example.seriesrecommend.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,7 +23,6 @@ import java.util.Optional;
 public class SeriesApiController {
 
     SeriesRepository seriesRepository;
-    UserRepository userRepository;
     SeriesRatingRepository ratingRepository;
 
 

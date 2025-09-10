@@ -66,7 +66,7 @@
         <section th:if="${#lists.size(recommendSeries) >= 10}" class="series-list">
             <div class="list-container">
                 <div class="list-items">
-                    <div class="list-item" th:each="series : ${allSeries}">
+                    <div class="list-item" th:each="series : ${recommendSeries}">
                         <div class="image-container">
                             <img th:src="${series.seriesImgUrl}" alt="Series poster">
                             <div th:if="${#authentication.principal != 'anonymousUser'}"

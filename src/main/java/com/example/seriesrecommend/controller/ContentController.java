@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 public class ContentController {
 
     SeriesService seriesService;
-    UserRepository userRepository;
     SeriesRatingRepository seriesRatingRepository;
 
 
